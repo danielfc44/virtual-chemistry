@@ -1,0 +1,325 @@
+---
+---
+
+<dialog id="molecule-dialog" class="molecule-dialog">
+  <button type="button" id="dialog-close" class="dialog-close" aria-label="Fechar">✕</button>
+
+  <div class="dialog-grid">
+    <div class="viewer-pane">
+      <canvas id="molecule-canvas"></canvas>
+      <p class="viewer-hint">🖱️ Arraste para rodar · Deslize para ampliar · Rotação automática</p>
+      <ul class="legend" id="m-legend"></ul>
+    </div>
+
+    <div class="info-pane">
+      <p class="scene-tag" id="m-scene-label"></p>
+      <h2 id="m-name"></h2>
+      <p class="formula" id="m-formula"></p>
+
+      <section>
+        <h3>Cenário do quotidiano</h3>
+        <p id="m-scene-description"></p>
+      </section>
+
+      <section>
+        <h3>Composição qualitativa</h3>
+        <p id="m-qualitative"></p>
+      </section>
+
+      <section>
+        <h3>Composição quantitativa</h3>
+        <table id="m-quantitative-table">
+          <thead>
+            <tr>
+              <th>Elemento</th>
+              <th>Átomos</th>
+              <th>Massa %</th>
+            </tr>
+          </thead>
+          <tbody id="m-quantitative-body"></tbody>
+        </table>
+        <p class="molar-mass" id="m-molar-mass"></p>
+      </section>
+
+      <section>
+        <h3>Geometria molecular</h3>
+        <p class="geometry-headline">
+          <strong id="m-geometry-shape"></strong> · ângulo de ligação <span id="m-geometry-angle"></span>
+        </p>
+        <p id="m-geometry-description"></p>
+      </section>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .molecule-dialog {
+    border: none;
+    border-radius: 20px;
+    padding: 0;
+    width: min(960px, 92vw);
+    max-height: 90vh;
+    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.35);
+  }
+
+  .molecule-dialog::backdrop {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(2px);
+  }
+
+  .dialog-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(15, 23, 42, 0.08);
+    color: #0f172a;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .dialog-close:hover {
+    background: rgba(15, 23, 42, 0.16);
+  }
+
+  .dialog-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    max-height: 90vh;
+  }
+
+  .viewer-pane {
+    background: radial-gradient(circle at 50% 30%, #eef2ff 0%, #dbe4ff 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 20px 0 0 20px;
+  }
+
+  #molecule-canvas {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 60vh;
+    border-radius: 14px;
+  }
+
+  .viewer-hint {
+    margin: 10px 0 0;
+    font-size: 0.75rem;
+    color: #475569;
+    text-align: center;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    font-size: 0.75rem;
+    color: #1e293b;
+  }
+
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(15, 23, 42, 0.25);
+    display: inline-block;
+  }
+
+  .info-pane {
+    padding: 28px 28px 24px;
+    overflow-y: auto;
+  }
+
+  .scene-tag {
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #2563eb;
+  }
+
+  .info-pane h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #0f172a;
+  }
+
+  .formula {
+    margin: 2px 0 18px;
+    font-size: 1.1rem;
+    color: #475569;
+  }
+
+  .info-pane section {
+    margin-bottom: 18px;
+  }
+
+  .info-pane h3 {
+    margin: 0 0 6px;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+  }
+
+  .info-pane p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #1e293b;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  th {
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .molar-mass {
+    margin-top: 8px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .geometry-headline {
+    margin-bottom: 4px !important;
+    color: #0f172a !important;
+  }
+
+  @media (max-width: 720px) {
+    .dialog-grid {
+      grid-template-columns: 1fr;
+    }
+    .viewer-pane {
+      border-radius: 20px 20px 0 0;
+    }
+  }
+</style>
+
+<script>
+  import { MOLECULES, getQualitativeComposition, getQuantitativeComposition } from '../data/molecules';
+  import { ELEMENTS } from '../data/elements';
+  import type { MoleculeViewerHandle } from '../lib/moleculeViewer';
+
+  const dialog = document.getElementById('molecule-dialog') as HTMLDialogElement;
+  const canvas = document.getElementById('molecule-canvas') as HTMLCanvasElement;
+
+  let viewerHandle: MoleculeViewerHandle | null = null;
+
+  function text(id: string, value: string) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  }
+
+  async function openMolecule(id: string) {
+    const molecule = MOLECULES[id];
+    if (!molecule) return;
+
+    const qualitative = getQualitativeComposition(molecule);
+    const quantitative = getQuantitativeComposition(molecule);
+
+    text('m-scene-label', molecule.scene.label);
+    text('m-name', molecule.name);
+    text('m-formula', `Fórmula química: ${molecule.formula}`);
+    text('m-scene-description', molecule.scene.description);
+
+    text(
+      'm-qualitative',
+      `Esta molécula é composta por ${qualitative.length} elemento${qualitative.length > 1 ? 's' : ''}: ` +
+        qualitative.map((symbol) => `${ELEMENTS[symbol].name} (${symbol})`).join(' e ') +
+        '.',
+    );
+
+    const tbody = document.getElementById('m-quantitative-body')!;
+    tbody.innerHTML = quantitative.breakdown
+      .map(
+        (row) => `
+          <tr>
+            <td>${row.name} (${row.symbol})</td>
+            <td>${row.count}</td>
+            <td>${row.massPercent.toFixed(1)}%</td>
+          </tr>`,
+      )
+      .join('');
+    text(
+      'm-molar-mass',
+      `Total: ${quantitative.totalAtoms} átomos · Massa molar ≈ ${quantitative.molarMass.toFixed(2)} g/mol`,
+    );
+
+    text('m-geometry-shape', molecule.geometry.shape);
+    text('m-geometry-angle', molecule.geometry.angle);
+    text('m-geometry-description', molecule.geometry.description);
+
+    const legend = document.getElementById('m-legend')!;
+    legend.innerHTML = qualitative
+      .map(
+        (symbol) => `
+          <li>
+            <span class="legend-dot" style="background:${ELEMENTS[symbol].color}"></span>
+            ${ELEMENTS[symbol].name}
+          </li>`,
+      )
+      .join('');
+
+    if (!dialog.open) dialog.showModal();
+
+    if (!viewerHandle) {
+      const { createMoleculeViewer } = await import('../lib/moleculeViewer');
+      // The dialog may have been closed while the module was loading.
+      if (!dialog.open) return;
+      viewerHandle = createMoleculeViewer(canvas);
+    }
+    viewerHandle.setMolecule(molecule);
+  }
+
+  document.addEventListener('click', (event) => {
+    const trigger = (event.target as HTMLElement).closest<HTMLElement>('[data-molecule-id]');
+    if (trigger) openMolecule(trigger.dataset.moleculeId!);
+  });
+
+  document.getElementById('dialog-close')?.addEventListener('click', () => dialog.close());
+
+  dialog.addEventListener('click', (event) => {
+    const bounds = dialog.getBoundingClientRect();
+    const clickedOutside =
+      event.clientX < bounds.left ||
+      event.clientX > bounds.right ||
+      event.clientY < bounds.top ||
+      event.clientY > bounds.bottom;
+    if (clickedOutside) dialog.close();
+  });
+
+  dialog.addEventListener('close', () => {
+    viewerHandle?.dispose();
+    viewerHandle = null;
+  });
+</script>

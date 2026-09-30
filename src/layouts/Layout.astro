@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+		<link rel="icon" href={`${import.meta.env.BASE_URL}favicon.ico`} />
+		<meta name="generator" content={Astro.generator} />
+		<meta
+			name="description"
+			content="Explore modelos moleculares 3D, a sua composição e geometria através de uma cena interativa do quotidiano."
+		/>
+		<title>Laboratório Virtual de Química</title>
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	* {
+		box-sizing: border-box;
+	}
+
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		min-height: 100%;
+		font-family: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
+		background: #f5f7fb;
+		color: #0f172a;
+	}
+</style>

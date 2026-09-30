@@ -1,0 +1,267 @@
+---
+import { MOLECULES } from '../data/molecules';
+
+interface Hotspot {
+  moleculeId: string;
+  x: number;
+  y: number;
+}
+
+// Positions are percentages over the 1200x700 viewBox of the scene illustration.
+const hotspots: Hotspot[] = [
+  { moleculeId: 'O3', x: 85, y: 10 },
+  { moleculeId: 'O2', x: 30, y: 14 },
+  { moleculeId: 'H2', x: 62, y: 20 },
+  { moleculeId: 'CO', x: 17, y: 30 },
+  { moleculeId: 'NH3', x: 10, y: 58 },
+  { moleculeId: 'H2O', x: 68, y: 72 },
+  { moleculeId: 'CO2', x: 47, y: 68 },
+];
+---
+
+<div class="scene">
+  <svg viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Uma cena ilustrada ao ar livre com um lago, uma quinta, uma fogueira e o céu">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#bfe3ff" />
+        <stop offset="60%" stop-color="#eaf7ff" />
+        <stop offset="100%" stop-color="#fdf3e0" />
+      </linearGradient>
+      <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#7cc9e8" />
+        <stop offset="100%" stop-color="#3b8fbd" />
+      </linearGradient>
+      <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff6d0" />
+        <stop offset="100%" stop-color="#ffd76a" />
+      </radialGradient>
+    </defs>
+
+    <!-- Sky -->
+    <rect x="0" y="0" width="1200" height="520" fill="url(#sky)" />
+
+    <!-- Sun (ozone / UV hotspot lives here) -->
+    <circle cx="1020" cy="90" r="70" fill="url(#sun)" opacity="0.95" />
+    <circle cx="1020" cy="90" r="95" fill="#fff6d0" opacity="0.25" />
+
+    <!-- Clouds (oxygen hotspot lives here) -->
+    <g fill="#ffffff" opacity="0.95" class="cloud cloud-a">
+      <ellipse cx="360" cy="110" rx="70" ry="30" />
+      <ellipse cx="410" cy="95" rx="55" ry="26" />
+      <ellipse cx="310" cy="100" rx="50" ry="24" />
+    </g>
+    <g fill="#ffffff" opacity="0.85" class="cloud cloud-b">
+      <ellipse cx="740" cy="150" rx="60" ry="24" />
+      <ellipse cx="780" cy="140" rx="42" ry="20" />
+    </g>
+
+    <!-- Hydrogen balloon -->
+    <g class="balloon">
+      <path d="M744 230 C 700 230 690 190 720 165 C 745 145 785 145 810 165 C 840 190 828 230 784 230 Z" fill="#e0453f" />
+      <path d="M764 230 L 758 245 L 770 245 Z" fill="#e0453f" />
+      <line x1="764" y1="245" x2="740" y2="330" stroke="#8a8a8a" stroke-width="2" />
+    </g>
+
+    <!-- Mountains -->
+    <path d="M0 420 L 150 300 L 260 400 L 380 280 L 520 420 Z" fill="#9fb3a8" opacity="0.8" />
+    <path d="M550 430 L 700 320 L 850 430 Z" fill="#8aa398" opacity="0.7" />
+
+    <!-- Ground -->
+    <rect x="0" y="420" width="1200" height="280" fill="#cfe6b8" />
+
+    <!-- Barn (ammonia hotspot) -->
+    <g transform="translate(70,430)">
+      <rect x="0" y="60" width="150" height="100" fill="#b5432f" />
+      <polygon points="0,60 75,10 150,60" fill="#7c2d20" />
+      <rect x="55" y="100" width="40" height="60" fill="#4a2a1d" />
+      <rect x="15" y="80" width="25" height="25" fill="#e8d7b0" />
+      <rect x="110" y="80" width="25" height="25" fill="#e8d7b0" />
+      <rect x="-60" y="140" width="60" height="6" fill="#8a6b4a" />
+      <rect x="-60" y="120" width="6" height="26" fill="#8a6b4a" />
+      <rect x="-30" y="120" width="6" height="26" fill="#8a6b4a" />
+    </g>
+
+    <!-- Cottage with chimney (carbon monoxide hotspot) -->
+    <g transform="translate(260,470)">
+      <rect x="0" y="40" width="110" height="70" fill="#e4c9a1" />
+      <polygon points="-10,40 55,0 120,40" fill="#6b4a37" />
+      <rect x="40" y="70" width="30" height="40" fill="#4a2a1d" />
+      <rect x="85" y="10" width="16" height="35" fill="#7a7a7a" />
+      <g class="smoke smoke-dark">
+        <circle cx="93" cy="0" r="9" fill="#6b6b6b" opacity="0.8" />
+        <circle cx="100" cy="-20" r="12" fill="#7c7c7c" opacity="0.7" />
+        <circle cx="90" cy="-42" r="15" fill="#8d8d8d" opacity="0.55" />
+        <circle cx="100" cy="-68" r="18" fill="#9e9e9e" opacity="0.4" />
+      </g>
+    </g>
+
+    <!-- Lake (water hotspot) -->
+    <path d="M520 480 C 680 440 900 450 1180 500 L 1200 700 L 480 700 Z" fill="url(#water)" />
+    <g class="ripple" stroke="#eaf7ff" stroke-width="3" fill="none" opacity="0.5">
+      <path d="M600 540 q 40 -12 80 0 t 80 0" />
+      <path d="M780 580 q 40 -12 80 0 t 80 0" />
+      <path d="M650 620 q 40 -12 80 0 t 80 0" />
+    </g>
+
+    <!-- Campfire (carbon dioxide hotspot) -->
+    <g transform="translate(560,555)">
+      <g fill="#7a5230">
+        <rect x="-30" y="30" width="60" height="8" transform="rotate(20)" />
+        <rect x="-30" y="30" width="60" height="8" transform="rotate(-20)" />
+      </g>
+      <g class="flame">
+        <path d="M0 30 C -18 10 -10 -15 0 -35 C 10 -15 18 10 0 30 Z" fill="#ff7b1a" />
+        <path d="M0 22 C -9 8 -5 -6 0 -18 C 5 -6 9 8 0 22 Z" fill="#ffd23f" />
+      </g>
+      <g class="smoke smoke-light">
+        <circle cx="4" cy="-40" r="10" fill="#cfcfcf" opacity="0.6" />
+        <circle cx="-4" cy="-62" r="13" fill="#d9d9d9" opacity="0.45" />
+        <circle cx="6" cy="-88" r="16" fill="#e4e4e4" opacity="0.3" />
+      </g>
+    </g>
+  </svg>
+
+  {hotspots.map(({ moleculeId, x, y }) => {
+    const molecule = MOLECULES[moleculeId];
+    return (
+      <button
+        type="button"
+        class="hotspot"
+        style={`left:${x}%; top:${y}%;`}
+        data-molecule-id={moleculeId}
+        aria-label={`Mostrar ${molecule.name} (${molecule.formula}) — ${molecule.scene.label}`}
+      >
+        <span class="hotspot-dot"></span>
+        <span class="hotspot-tag">{molecule.formula}</span>
+      </button>
+    );
+  })}
+</div>
+
+<style>
+  .scene {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1200 / 700;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+  }
+
+  .scene svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .cloud-a {
+    animation: drift 40s linear infinite;
+  }
+  .cloud-b {
+    animation: drift 55s linear infinite reverse;
+  }
+  @keyframes drift {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(40px); }
+    100% { transform: translateX(0); }
+  }
+
+  .balloon {
+    animation: bob 4s ease-in-out infinite;
+    transform-origin: center;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+
+  .flame {
+    animation: flicker 1.4s ease-in-out infinite;
+    transform-origin: center bottom;
+  }
+  @keyframes flicker {
+    0%, 100% { transform: scale(1, 1); }
+    50% { transform: scale(0.92, 1.08); }
+  }
+
+  .smoke circle {
+    animation: rise 4s ease-in infinite;
+  }
+  .smoke circle:nth-child(2) { animation-delay: 0.6s; }
+  .smoke circle:nth-child(3) { animation-delay: 1.2s; }
+  .smoke circle:nth-child(4) { animation-delay: 1.8s; }
+  @keyframes rise {
+    0% { transform: translateY(0); opacity: 0.7; }
+    100% { transform: translateY(-30px); opacity: 0; }
+  }
+
+  .ripple path {
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  .ripple path:nth-child(2) { animation-delay: 0.5s; }
+  .ripple path:nth-child(3) { animation-delay: 1s; }
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  .hotspot {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hotspot-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.55);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6);
+    animation: pulse 2.2s ease-out infinite;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.55); }
+    70% { box-shadow: 0 0 0 14px rgba(59, 130, 246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+  }
+
+  .hotspot-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 1px 7px;
+    border-radius: 999px;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(-2px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  .hotspot:hover .hotspot-tag,
+  .hotspot:focus-visible .hotspot-tag {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hotspot:hover .hotspot-dot,
+  .hotspot:focus-visible .hotspot-dot {
+    background: rgba(59, 130, 246, 0.85);
+  }
+
+  .hotspot:focus-visible {
+    outline: 2px solid #1d4ed8;
+    outline-offset: 4px;
+    border-radius: 50%;
+  }
+</style>
