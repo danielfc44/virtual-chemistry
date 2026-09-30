@@ -1,33 +1,36 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import SceneHotspots from '../components/SceneHotspots.astro';
-import MoleculeDirectory from '../components/MoleculeDirectory.astro';
-import MoleculeModal from '../components/MoleculeModal.astro';
+import MoleculeScene from '../components/MoleculeScene.astro';
+import MoleculeList from '../components/MoleculeList.astro';
+import MoleculeInfo from '../components/MoleculeInfo.astro';
 ---
 
 <Layout>
 	<main class="page">
 		<header class="page-header">
 			<p class="eyebrow">Laboratório Virtual de Química</p>
-			<h1>Moléculas do dia a dia</h1>
+			<h1>Lupa mágica molécular</h1>
 			<p class="lead">
-				Explore uma cena comum ao ar livre e descubra as moléculas escondidas nela. Clique num
-				ponto brilhante na ilustração — ou num cartão abaixo — para abrir um modelo 3D e ver a
-				sua composição qualitativa, composição quantitativa e geometria molecular.
+				Explore uma paisagem do quotidiano e descubra as moléculas escondidas nela. Passe o rato
+				ou clique num ponto brilhante da imagem — ou num cartão da lista abaixo — para ver o
+				modelo 3D a rodar no local, com a sua relevância, composição qualitativa, composição
+				quantitativa e geometria molecular.
 			</p>
 		</header>
 
 		<section aria-label="Cena interativa">
-			<SceneHotspots />
+			<MoleculeScene />
 		</section>
 
 		<section class="directory-section" aria-label="Todas as moléculas">
 			<h2>Ou vá diretamente para uma molécula</h2>
-			<MoleculeDirectory />
+			<MoleculeList />
+		</section>
+
+		<section aria-label="Detalhes da molécula selecionada">
+			<MoleculeInfo />
 		</section>
 	</main>
-
-	<MoleculeModal />
 </Layout>
 
 <style>

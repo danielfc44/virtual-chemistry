@@ -1,0 +1,238 @@
+---
+import { MOLECULES, MOLECULE_ORDER } from '../data/molecules';
+---
+
+<div class="scene-wrap" id="molecule-scene">
+  <img
+    src={`${import.meta.env.BASE_URL}scenario.jpeg`}
+    alt="Uma paisagem com um lago, uma fábrica com chaminés a fumegar, um campo agrícola, uma estrada com um carro e árvores"
+    class="scene-image"
+  />
+
+  {MOLECULE_ORDER.map((id) => {
+    const molecule = MOLECULES[id];
+    return (
+      <button
+        type="button"
+        class="hotspot"
+        data-molecule-id={id}
+        style={`left:${molecule.hotspot.x}%; top:${molecule.hotspot.y}%;`}
+        aria-label={`Mostrar ${molecule.name} (${molecule.formula}) — ${molecule.hotspotLabel}`}
+      >
+        <span class="hotspot-dot">{molecule.icon}</span>
+      </button>
+    );
+  })}
+
+  <div class="bubble" id="molecule-bubble">
+    <canvas id="molecule-canvas"></canvas>
+    <p class="bubble-label" id="bubble-label"></p>
+  </div>
+</div>
+
+<p class="scene-hint">🖱️ Passe o rato ou clique num ponto da imagem para ver a molécula a rodar no local.</p>
+
+<style>
+  .scene-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1024 / 559;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+    background: #cbd5e1;
+  }
+
+  .scene-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    padding: 6px;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .hotspot-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #facc15;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7);
+    animation: pulse 2.2s infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    line-height: 1;
+  }
+
+  .hotspot.is-active .hotspot-dot {
+    background: #2563eb;
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.55);
+    }
+    70% {
+      box-shadow: 0 0 0 14px rgba(250, 204, 21, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(250, 204, 21, 0);
+    }
+  }
+
+  .bubble {
+    --shift-x: 0px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 150px;
+    transform: translate(calc(-50% + var(--shift-x)), calc(-100% - 22px)) scale(0.85);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 3;
+  }
+
+  .bubble.flip-down {
+    transform: translate(calc(-50% + var(--shift-x)), 22px) scale(0.85);
+  }
+
+  .bubble.is-active {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--shift-x)), calc(-100% - 22px)) scale(1);
+  }
+
+  .bubble.is-active.flip-down {
+    transform: translate(calc(-50% + var(--shift-x)), 22px) scale(1);
+  }
+
+  #molecule-canvas {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 30%, #eef2ff 0%, #dbe4ff 100%);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.35), 0 0 0 4px rgba(255, 255, 255, 0.9);
+    touch-action: none;
+  }
+
+  .bubble-label {
+    margin: 6px 0 0;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+
+  .scene-hint {
+    margin: 10px 0 0;
+    font-size: 0.8rem;
+    color: #64748b;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .bubble {
+      width: 110px;
+    }
+    #molecule-canvas {
+      width: 110px;
+      height: 110px;
+    }
+  }
+</style>
+
+<script>
+  import { MOLECULES } from '../data/molecules';
+  import type { MoleculeViewerHandle } from '../lib/moleculeViewer';
+
+  const scene = document.getElementById('molecule-scene')!;
+  const bubble = document.getElementById('molecule-bubble')!;
+  const canvas = document.getElementById('molecule-canvas') as HTMLCanvasElement;
+  const bubbleLabel = document.getElementById('bubble-label')!;
+  const hotspots = Array.from(scene.querySelectorAll<HTMLButtonElement>('.hotspot'));
+
+  let viewerHandle: MoleculeViewerHandle | null = null;
+  let currentId: string | null = null;
+
+  async function activateLocal(id: string) {
+    const molecule = MOLECULES[id];
+    if (!molecule) return;
+    currentId = id;
+
+    hotspots.forEach((hotspot) => {
+      hotspot.classList.toggle('is-active', hotspot.dataset.moleculeId === id);
+    });
+
+    bubble.style.removeProperty('--shift-x');
+    bubble.style.left = `${molecule.hotspot.x}%`;
+    bubble.style.top = `${molecule.hotspot.y}%`;
+    bubble.classList.toggle('flip-down', Boolean(molecule.hotspot.flipBubble));
+    bubbleLabel.textContent = `${molecule.formula} · ${molecule.name}`;
+    bubble.classList.add('is-active');
+
+    if (!viewerHandle) {
+      const { createMoleculeViewer } = await import('../lib/moleculeViewer');
+      viewerHandle = createMoleculeViewer(canvas);
+    }
+    viewerHandle.setMolecule(molecule);
+
+    // Safety net: if the preview bubble still clips outside the scene edges
+    // (e.g. a hotspot too close to the top/bottom/sides), flip or nudge it
+    // back inside instead of letting it disappear behind the clipped scene.
+    requestAnimationFrame(() => {
+      const sceneRect = scene.getBoundingClientRect();
+      const bubbleRect = bubble.getBoundingClientRect();
+
+      if (bubbleRect.top < sceneRect.top) {
+        bubble.classList.add('flip-down');
+      } else if (bubbleRect.bottom > sceneRect.bottom) {
+        bubble.classList.remove('flip-down');
+      }
+
+      const correctedRect = bubble.getBoundingClientRect();
+      let shiftX = 0;
+      if (correctedRect.left < sceneRect.left) {
+        shiftX = sceneRect.left - correctedRect.left + 8;
+      } else if (correctedRect.right > sceneRect.right) {
+        shiftX = sceneRect.right - correctedRect.right - 8;
+      }
+      if (shiftX !== 0) {
+        bubble.style.setProperty('--shift-x', `${shiftX}px`);
+      }
+    });
+  }
+
+  function selectAndBroadcast(id: string) {
+    activateLocal(id);
+    window.dispatchEvent(new CustomEvent('molecule:select', { detail: { id } }));
+  }
+
+  hotspots.forEach((hotspot) => {
+    const id = hotspot.dataset.moleculeId!;
+    hotspot.addEventListener('click', () => selectAndBroadcast(id));
+    hotspot.addEventListener('pointerenter', () => selectAndBroadcast(id));
+  });
+
+  window.addEventListener('molecule:select', ((event: CustomEvent<{ id: string }>) => {
+    if (event.detail.id !== currentId) activateLocal(event.detail.id);
+  }) as EventListener);
+</script>

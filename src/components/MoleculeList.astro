@@ -1,0 +1,88 @@
+---
+import { MOLECULES, MOLECULE_ORDER } from '../data/molecules';
+---
+
+<div class="directory" id="molecule-list">
+  {MOLECULE_ORDER.map((id) => {
+    const molecule = MOLECULES[id];
+    return (
+      <button type="button" class="card" data-molecule-id={id}>
+        <span class="card-formula">{molecule.formula}</span>
+        <span class="card-name">{molecule.name}</span>
+      </button>
+    );
+  })}
+</div>
+
+<style>
+  .directory {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .card {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+
+  .card:hover,
+  .card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.1);
+    border-color: #93c5fd;
+    outline: none;
+  }
+
+  .card.is-active {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  }
+
+  .card-formula {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    white-space: nowrap;
+  }
+
+  .card-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #0f172a;
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  const list = document.getElementById('molecule-list')!;
+  const cards = Array.from(list.querySelectorAll<HTMLButtonElement>('.card'));
+
+  function updateActiveCard(id: string) {
+    cards.forEach((card) => {
+      card.classList.toggle('is-active', card.dataset.moleculeId === id);
+    });
+  }
+
+  cards.forEach((card) => {
+    const id = card.dataset.moleculeId!;
+    card.addEventListener('click', () => {
+      updateActiveCard(id);
+      window.dispatchEvent(new CustomEvent('molecule:select', { detail: { id } }));
+    });
+  });
+
+  window.addEventListener('molecule:select', ((event: CustomEvent<{ id: string }>) => {
+    updateActiveCard(event.detail.id);
+  }) as EventListener);
+</script>

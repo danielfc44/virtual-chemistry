@@ -103,8 +103,11 @@ export function createMoleculeViewer(canvas: HTMLCanvasElement): MoleculeViewerH
   controls.enableDamping = true;
   controls.autoRotate = true;
   controls.autoRotateSpeed = 1.8;
-  controls.minDistance = 1;
-  controls.maxDistance = 30;
+
+  // The wheel event doubles as the OrbitControls zoom gesture; stop it from
+  // also scrolling the host page, which would otherwise drag the whole
+  // viewport (and this floating preview) out of view while zooming.
+  canvas.addEventListener('wheel', (event) => event.preventDefault(), { passive: false });
 
   let moleculeGroup = new THREE.Group();
   scene.add(moleculeGroup);
@@ -183,8 +186,13 @@ export function createMoleculeViewer(canvas: HTMLCanvasElement): MoleculeViewerH
 
     const distance = boundingRadius * 3.2;
     camera.position.set(distance * 0.6, distance * 0.4, distance * 0.7);
-    camera.near = distance / 100;
-    camera.far = distance * 10;
+    camera.near = Math.max(0.01, boundingRadius * 0.05);
+    // Keep the zoom range (min/maxDistance) comfortably inside the far plane
+    // so zooming out never pushes the camera past it — otherwise the whole
+    // molecule gets clipped and appears to vanish.
+    controls.minDistance = boundingRadius * 1.2;
+    controls.maxDistance = distance * 2.5;
+    camera.far = controls.maxDistance * 1.5;
     camera.updateProjectionMatrix();
     controls.target.set(0, 0, 0);
     controls.update();

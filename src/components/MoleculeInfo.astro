@@ -1,0 +1,237 @@
+---
+import { MOLECULE_ORDER } from '../data/molecules';
+
+const DEFAULT_MOLECULE_ID = MOLECULE_ORDER[0];
+---
+
+<div class="info-panel" id="molecule-info" data-default-id={DEFAULT_MOLECULE_ID}>
+  <p class="scene-tag" id="m-hotspot-label"></p>
+  <h2 id="m-name"><span id="m-name-text"></span> <span class="common-name" id="m-common-name"></span></h2>
+  <p class="formula" id="m-formula"></p>
+
+  <div class="info-grid">
+    <section>
+      <h3>Relevância</h3>
+      <p id="m-relevance"></p>
+    </section>
+
+    <section>
+      <h3>Composição qualitativa</h3>
+      <p id="m-qualitative"></p>
+      <ul class="legend" id="m-legend"></ul>
+    </section>
+
+    <section>
+      <h3>Composição quantitativa</h3>
+      <table id="m-quantitative-table">
+        <thead>
+          <tr>
+            <th>Elemento</th>
+            <th>Átomos</th>
+            <th>Massa %</th>
+          </tr>
+        </thead>
+        <tbody id="m-quantitative-body"></tbody>
+      </table>
+      <p class="molar-mass" id="m-molar-mass"></p>
+    </section>
+
+    <section>
+      <h3>Geometria molecular</h3>
+      <p class="geometry-headline">
+        <strong id="m-geometry-shape"></strong> · ângulo de ligação <span id="m-geometry-angle"></span>
+      </p>
+      <p id="m-geometry-description"></p>
+    </section>
+  </div>
+</div>
+
+<style>
+  .info-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  }
+
+  .scene-tag {
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #2563eb;
+  }
+
+  .info-panel h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #0f172a;
+  }
+
+  .common-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #64748b;
+  }
+
+  .formula {
+    margin: 2px 0 20px;
+    font-size: 1.1rem;
+    color: #475569;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .info-panel section h3 {
+    margin: 0 0 6px;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+  }
+
+  .info-panel section p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #1e293b;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    font-size: 0.78rem;
+    color: #1e293b;
+  }
+
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(15, 23, 42, 0.25);
+    display: inline-block;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  th {
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  .molar-mass {
+    margin-top: 8px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .geometry-headline {
+    margin-bottom: 4px !important;
+    color: #0f172a !important;
+  }
+
+  @media (max-width: 720px) {
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { MOLECULES, getQualitativeComposition, getQuantitativeComposition } from '../data/molecules';
+  import { ELEMENTS } from '../data/elements';
+
+  function text(id: string, value: string) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  }
+
+  function renderInfo(id: string) {
+    const molecule = MOLECULES[id];
+    if (!molecule) return;
+
+    const qualitative = getQualitativeComposition(molecule);
+    const quantitative = getQuantitativeComposition(molecule);
+
+    text('m-hotspot-label', molecule.hotspotLabel);
+    text('m-name-text', molecule.name);
+    text('m-common-name', molecule.commonName ? `(${molecule.commonName})` : '');
+    text('m-formula', `Fórmula química: ${molecule.formula}`);
+    text('m-relevance', molecule.relevance);
+
+    text(
+      'm-qualitative',
+      `Esta molécula é composta por ${qualitative.length} elemento${qualitative.length > 1 ? 's' : ''}: ` +
+        qualitative.map((symbol) => `${ELEMENTS[symbol].name} (${symbol})`).join(' e ') +
+        '.',
+    );
+
+    const legend = document.getElementById('m-legend')!;
+    legend.innerHTML = qualitative
+      .map(
+        (symbol) => `
+          <li>
+            <span class="legend-dot" style="background:${ELEMENTS[symbol].color}"></span>
+            ${ELEMENTS[symbol].name}
+          </li>`,
+      )
+      .join('');
+
+    const tbody = document.getElementById('m-quantitative-body')!;
+    tbody.innerHTML = quantitative.breakdown
+      .map(
+        (row) => `
+          <tr>
+            <td>${row.name} (${row.symbol})</td>
+            <td>${row.count}</td>
+            <td>${row.massPercent.toFixed(1)}%</td>
+          </tr>`,
+      )
+      .join('');
+    text(
+      'm-molar-mass',
+      `Total: ${quantitative.totalAtoms} átomos · Massa molar ≈ ${quantitative.molarMass.toFixed(2)} g/mol`,
+    );
+
+    text('m-geometry-shape', molecule.geometry.shape);
+    text('m-geometry-angle', molecule.geometry.angle);
+    text('m-geometry-description', molecule.geometry.description);
+  }
+
+  window.addEventListener('molecule:select', ((event: CustomEvent<{ id: string }>) => {
+    renderInfo(event.detail.id);
+  }) as EventListener);
+
+  const defaultId = document.getElementById('molecule-info')?.dataset.defaultId;
+  if (defaultId) {
+    renderInfo(defaultId);
+    window.dispatchEvent(new CustomEvent('molecule:select', { detail: { id: defaultId } }));
+  }
+</script>

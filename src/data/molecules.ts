@@ -17,7 +17,10 @@ export interface Bond {
 
 export interface Molecule {
   id: string;
+  /** Formal/systematic name, e.g. "Di-hidrogénio". */
   name: string;
+  /** Optional common/alternative name shown alongside the formal name, e.g. "Hidrogénio molecular". */
+  commonName?: string;
   formula: string;
   atoms: Atom[];
   bonds: Bond[];
@@ -29,10 +32,18 @@ export interface Molecule {
     /** Short explanation of why the molecule has this shape. */
     description: string;
   };
-  /** The real-life scene hotspot this molecule is attached to. */
-  scene: {
-    label: string;
-    description: string;
+  /** Short name of the real-life spot this molecule is tied to, e.g. "O lago". */
+  hotspotLabel: string;
+  /** Emoji shown inside the hotspot dot, suggesting the molecule's real-life context. */
+  icon: string;
+  /** Why this molecule matters in everyday life / nature. */
+  relevance: string;
+  /** Position of the hotspot marker over the scenario image, in percent. */
+  hotspot: {
+    x: number;
+    y: number;
+    /** Show the rotating preview bubble below the marker instead of above it. */
+    flipBubble?: boolean;
   };
 }
 
@@ -78,7 +89,8 @@ export function getQuantitativeComposition(molecule: Molecule) {
 export const MOLECULES: Record<string, Molecule> = {
   H2: {
     id: 'H2',
-    name: 'Hidrogénio',
+    name: 'Di-hidrogénio',
+    commonName: 'Hidrogénio molecular',
     formula: 'H₂',
     atoms: [
       { element: 'H', position: [-0.37, 0, 0] },
@@ -91,11 +103,11 @@ export const MOLECULES: Record<string, Molecule> = {
       description:
         'Uma molécula diatómica: dois átomos unidos por uma ligação covalente simples formam sempre uma linha reta.',
     },
-    scene: {
-      label: 'Balão de hidrogénio',
-      description:
-        'O balão de festa a flutuar está cheio de gás hidrogénio (H₂), a molécula mais leve que existe, razão pela qual sobe no céu.',
-    },
+    hotspotLabel: 'Energia limpa',
+    icon: '⚡',
+    relevance:
+      'Alternativa energética limpa, produzido por eletrólise da água usando energia renovável.',
+    hotspot: { x: 8, y: 9, flipBubble: true },
   },
   H2O: {
     id: 'H2O',
@@ -116,15 +128,15 @@ export const MOLECULES: Record<string, Molecule> = {
       description:
         'O oxigénio tem dois pares de eletrões isolados que empurram as ligações O–H uma contra a outra, dobrando a molécula em vez de a deixar linear.',
     },
-    scene: {
-      label: 'O lago',
-      description:
-        'O lago calmo é feito de água (H₂O): dois átomos de hidrogénio ligados a um átomo de oxigénio, a molécula que cobre a maior parte do nosso planeta.',
-    },
+    hotspotLabel: 'O lago',
+    icon: '💧',
+    relevance: 'Substância essencial à vida. Constitui 71% da superfície da Terra.',
+    hotspot: { x: 35, y: 52 },
   },
   O2: {
     id: 'O2',
-    name: 'Oxigénio',
+    name: 'Dioxigénio',
+    commonName: 'Oxigénio molecular',
     formula: 'O₂',
     atoms: [
       { element: 'O', position: [-0.605, 0, 0] },
@@ -137,11 +149,11 @@ export const MOLECULES: Record<string, Molecule> = {
       description:
         'Dois átomos de oxigénio partilham dois pares de eletrões numa ligação dupla, e qualquer molécula de dois átomos é necessariamente linear.',
     },
-    scene: {
-      label: 'O céu aberto',
-      description:
-        'O ar que respiramos é composto por cerca de 21% de gás oxigénio (O₂), dois átomos de oxigénio ligados por uma ligação dupla, essencial para a respiração.',
-    },
+    hotspotLabel: 'A floresta',
+    icon: '🌳',
+    relevance:
+      'Produzido pela fotossíntese da floresta e vegetação. É indispensável para a respiração celular da grande maioria dos organismos vivos.',
+    hotspot: { x: 86, y: 58 },
   },
   CO: {
     id: 'CO',
@@ -158,11 +170,11 @@ export const MOLECULES: Record<string, Molecule> = {
       description:
         'O carbono e o oxigénio partilham três pares de eletrões numa ligação tripla; com apenas dois átomos, a forma é sempre linear.',
     },
-    scene: {
-      label: 'Fumo da chaminé',
-      description:
-        'A combustão incompleta na chaminé liberta monóxido de carbono (CO), um gás incolor, inodoro e perigoso, formado quando o combustível arde sem oxigénio suficiente.',
-    },
+    hotspotLabel: 'O carro na estrada',
+    icon: '🚗',
+    relevance:
+      'Gás poluente tóxico resultante da combustão incompleta de combustível no motor do veículo.',
+    hotspot: { x: 73, y: 83 },
   },
   CO2: {
     id: 'CO2',
@@ -183,11 +195,11 @@ export const MOLECULES: Record<string, Molecule> = {
       description:
         'O carbono não tem pares de eletrões isolados aqui, por isso as duas ligações duplas ao oxigénio apontam em direções exatamente opostas.',
     },
-    scene: {
-      label: 'Fogueira',
-      description:
-        'O fumo da fogueira transporta dióxido de carbono (CO₂), produzido quando o carbono da madeira se combina totalmente com o oxigénio do ar.',
-    },
+    hotspotLabel: 'Fumo da fábrica',
+    icon: '🏭',
+    relevance:
+      'Gás resultante de processos industriais e da combustão de combustíveis fósseis. Essencial para a fotossíntese e responsável pelo efeito de estufa.',
+    hotspot: { x: 41, y: 16, flipBubble: true },
   },
   O3: {
     id: 'O3',
@@ -208,11 +220,11 @@ export const MOLECULES: Record<string, Molecule> = {
       description:
         'O oxigénio central tem um par de eletrões isolado que dobra a molécula, e a ressonância distribui os eletrões de ligação uniformemente pelas duas ligações O–O.',
     },
-    scene: {
-      label: 'Sol e brilho do céu',
-      description:
-        'Bem no alto, a camada de ozono (O₃) forma-se a partir de três átomos de oxigénio e filtra a maior parte da radiação ultravioleta nociva do Sol.',
-    },
+    hotspotLabel: 'Camada de ozono',
+    icon: '🛡️',
+    relevance:
+      'Forma-se na atmosfera a partir de três átomos de oxigénio e filtra a maior parte da radiação ultravioleta nociva do Sol, protegendo a vida na Terra.',
+    hotspot: { x: 92, y: 7, flipBubble: true },
   },
   NH3: {
     id: 'NH3',
@@ -235,12 +247,34 @@ export const MOLECULES: Record<string, Molecule> = {
       description:
         'O par de eletrões isolado do azoto empurra as três ligações N–H para baixo, formando uma pirâmide em vez do arranjo plano trigonal.',
     },
-    scene: {
-      label: 'O celeiro',
+    hotspotLabel: 'O campo agrícola',
+    icon: '🌾',
+    relevance:
+      'Composto muito utilizado na produção de fertilizantes agrícolas para nutrir o solo, e em produtos de limpeza.',
+    hotspot: { x: 15, y: 79 },
+  },
+  N2: {
+    id: 'N2',
+    name: 'Dinitrogénio',
+    commonName: 'Nitrogénio molecular',
+    formula: 'N₂',
+    atoms: [
+      { element: 'N', position: [-0.55, 0, 0] },
+      { element: 'N', position: [0.55, 0, 0] },
+    ],
+    bonds: [{ from: 0, to: 1, order: 3 }],
+    geometry: {
+      shape: 'Linear',
+      angle: '180°',
       description:
-        'O cheiro forte perto do celeiro vem do amoníaco (NH₃), um átomo de azoto ligado a três átomos de hidrogénio, comum em fertilizantes e dejetos animais.',
+        'Os dois átomos de azoto partilham três pares de eletrões numa ligação tripla muito forte; com apenas dois átomos, a forma é sempre linear.',
     },
+    hotspotLabel: 'O ar atmosférico',
+    icon: '🌬️',
+    relevance:
+      'Componente maioritário do ar atmosférico (cerca de 78%), quimicamente inerte em condições normais.',
+    hotspot: { x: 55, y: 9, flipBubble: true },
   },
 };
 
-export const MOLECULE_ORDER = ['H2O', 'O2', 'O3', 'CO2', 'CO', 'H2', 'NH3'];
+export const MOLECULE_ORDER = ['H2O', 'O2', 'N2', 'CO2', 'CO', 'O3', 'H2', 'NH3'];
