@@ -1,10 +1,9 @@
----
-import { MOLECULE_ORDER } from '../data/molecules';
+<div class="info-panel" id="molecule-info">
+  <p class="placeholder" id="molecule-placeholder">
+    Selecione uma molécula na imagem ou na lista para ver os seus detalhes.
+  </p>
 
-const DEFAULT_MOLECULE_ID = MOLECULE_ORDER[0];
----
-
-<div class="info-panel" id="molecule-info" data-default-id={DEFAULT_MOLECULE_ID}>
+  <div class="info-content" id="molecule-content" hidden>
   <p class="scene-tag" id="m-hotspot-label"></p>
   <h2 id="m-name"><span id="m-name-text"></span> <span class="common-name" id="m-common-name"></span></h2>
   <p class="formula" id="m-formula"></p>
@@ -44,6 +43,7 @@ const DEFAULT_MOLECULE_ID = MOLECULE_ORDER[0];
       <p id="m-geometry-description"></p>
     </section>
   </div>
+  </div>
 </div>
 
 <style>
@@ -53,6 +53,12 @@ const DEFAULT_MOLECULE_ID = MOLECULE_ORDER[0];
     border-radius: 20px;
     padding: 28px;
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  }
+
+  .placeholder {
+    margin: 0;
+    text-align: center;
+    color: #64748b;
   }
 
   .scene-tag {
@@ -120,7 +126,8 @@ const DEFAULT_MOLECULE_ID = MOLECULE_ORDER[0];
     gap: 6px;
   }
 
-  .legend-dot {
+  /* Rendered from script, so it needs :global to escape Astro's CSS scoping. */
+  .legend :global(.legend-dot) {
     width: 12px;
     height: 12px;
     border-radius: 50%;
@@ -135,7 +142,7 @@ const DEFAULT_MOLECULE_ID = MOLECULE_ORDER[0];
   }
 
   th,
-  td {
+  table :global(td) {
     text-align: left;
     padding: 6px 8px;
     border-bottom: 1px solid #e2e8f0;
@@ -176,6 +183,9 @@ const DEFAULT_MOLECULE_ID = MOLECULE_ORDER[0];
   function renderInfo(id: string) {
     const molecule = MOLECULES[id];
     if (!molecule) return;
+
+    document.getElementById('molecule-placeholder')!.hidden = true;
+    document.getElementById('molecule-content')!.hidden = false;
 
     const qualitative = getQualitativeComposition(molecule);
     const quantitative = getQuantitativeComposition(molecule);
@@ -228,10 +238,4 @@ const DEFAULT_MOLECULE_ID = MOLECULE_ORDER[0];
   window.addEventListener('molecule:select', ((event: CustomEvent<{ id: string }>) => {
     renderInfo(event.detail.id);
   }) as EventListener);
-
-  const defaultId = document.getElementById('molecule-info')?.dataset.defaultId;
-  if (defaultId) {
-    renderInfo(defaultId);
-    window.dispatchEvent(new CustomEvent('molecule:select', { detail: { id: defaultId } }));
-  }
 </script>

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ELEMENTS } from '../data/elements';
-import type { Molecule } from '../data/molecules';
+import type { MoleculeModel } from '../data/molecules';
 
 const BOND_RADIUS = 0.07;
 const BOND_COLOR = 0xd4d4d8;
@@ -75,7 +75,7 @@ function buildBondVisual(start: THREE.Vector3, end: THREE.Vector3, order: 1 | 2 
 }
 
 export interface MoleculeViewerHandle {
-  setMolecule(molecule: Molecule): void;
+  setMolecule(molecule: MoleculeModel): void;
   dispose(): void;
 }
 
@@ -131,7 +131,7 @@ export function createMoleculeViewer(canvas: HTMLCanvasElement): MoleculeViewerH
   });
   resizeObserver.observe(canvas);
 
-  function setMolecule(molecule: Molecule) {
+  function setMolecule(molecule: MoleculeModel) {
     scene.remove(moleculeGroup);
     moleculeGroup.traverse((child: THREE.Object3D) => {
       if (child instanceof THREE.Mesh) {

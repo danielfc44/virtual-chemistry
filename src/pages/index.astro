@@ -9,12 +9,13 @@ import MoleculeInfo from '../components/MoleculeInfo.astro';
 	<main class="page">
 		<header class="page-header">
 			<p class="eyebrow">Laboratório Virtual de Química</p>
-			<h1>Lupa mágica molécular</h1>
+			<h1>Lupa mágica molecular</h1>
 			<p class="lead">
-				Explore uma paisagem do quotidiano e descubra as moléculas escondidas nela. Passe o rato
-				ou clique num ponto brilhante da imagem — ou num cartão da lista abaixo — para ver o
+				Explore uma paisagem do quotidiano e descubra as moléculas escondidas nela. Clique
+				num ponto brilhante da imagem — ou num cartão da lista abaixo — para ver o
 				modelo 3D a rodar no local, com a sua relevância, composição qualitativa, composição
-				quantitativa e geometria molecular.
+				quantitativa e geometria molecular. Clique em «Explorar a fábrica» para descobrir
+				também os produtos do laboratório.
 			</p>
 		</header>
 
@@ -23,7 +24,6 @@ import MoleculeInfo from '../components/MoleculeInfo.astro';
 		</section>
 
 		<section class="directory-section" aria-label="Todas as moléculas">
-			<h2>Ou vá diretamente para uma molécula</h2>
 			<MoleculeList />
 		</section>
 
@@ -35,17 +35,17 @@ import MoleculeInfo from '../components/MoleculeInfo.astro';
 
 <style>
 	.page {
-		max-width: 1100px;
+		max-width: 1200px;
 		margin: 0 auto;
-		padding: 40px 20px 80px;
+		padding: 20px 10px 40px;
 		display: flex;
 		flex-direction: column;
-		gap: 40px;
+		gap: 20px;
 	}
 
 	.page-header {
 		text-align: center;
-		max-width: 720px;
+		max-width: 1000px;
 		margin: 0 auto;
 	}
 
@@ -55,11 +55,11 @@ import MoleculeInfo from '../components/MoleculeInfo.astro';
 		font-size: 0.8rem;
 		font-weight: 700;
 		color: #2563eb;
-		margin: 0 0 8px;
+		margin: 0 0 4px;
 	}
 
 	h1 {
-		margin: 0 0 12px;
+		margin: 0 0 10px;
 		font-size: clamp(1.8rem, 3vw, 2.6rem);
 		color: #0f172a;
 	}
@@ -67,7 +67,7 @@ import MoleculeInfo from '../components/MoleculeInfo.astro';
 	.lead {
 		margin: 0;
 		font-size: 1.05rem;
-		line-height: 1.6;
+		line-height: 1.5;
 		color: #475569;
 	}
 

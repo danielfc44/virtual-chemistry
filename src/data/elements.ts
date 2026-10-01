@@ -17,6 +17,6 @@ export interface ElementInfo {
 export const ELEMENTS: Record<string, ElementInfo> = {
   H: { symbol: 'H', name: 'Hidrogénio', atomicWeight: 1.008, color: '#ffffff', radius: 0.22 },
   C: { symbol: 'C', name: 'Carbono', atomicWeight: 12.011, color: '#2b2b2b', radius: 0.4 },
-  N: { symbol: 'N', name: 'Azoto', atomicWeight: 14.007, color: '#3050f8', radius: 0.4 },
+  N: { symbol: 'N', name: 'Nitrogénio', atomicWeight: 14.007, color: '#3050f8', radius: 0.4 },
   O: { symbol: 'O', name: 'Oxigénio', atomicWeight: 15.999, color: '#ff0d0d', radius: 0.4 },
 };

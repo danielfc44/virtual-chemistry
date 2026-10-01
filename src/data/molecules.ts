@@ -15,15 +15,19 @@ export interface Bond {
   order: 1 | 2 | 3;
 }
 
-export interface Molecule {
+/** The minimum data the 3D viewer needs to draw a molecule. */
+export interface MoleculeModel {
+  atoms: Atom[];
+  bonds: Bond[];
+}
+
+export interface Molecule extends MoleculeModel {
   id: string;
   /** Formal/systematic name, e.g. "Di-hidrogénio". */
   name: string;
   /** Optional common/alternative name shown alongside the formal name, e.g. "Hidrogénio molecular". */
   commonName?: string;
   formula: string;
-  atoms: Atom[];
-  bonds: Bond[];
   geometry: {
     /** VSEPR shape name, e.g. "Angular", "Linear", "Piramidal trigonal". */
     shape: string;
@@ -50,7 +54,7 @@ export interface Molecule {
 /**
  * Computes the qualitative composition (distinct elements) of a molecule.
  */
-export function getQualitativeComposition(molecule: Molecule): string[] {
+export function getQualitativeComposition(molecule: MoleculeModel): string[] {
   return Array.from(new Set(molecule.atoms.map((atom) => atom.element)));
 }
 
@@ -58,7 +62,7 @@ export function getQualitativeComposition(molecule: Molecule): string[] {
  * Computes the quantitative composition: atom counts per element, total atom
  * count, molar mass, and mass percentage contributed by each element.
  */
-export function getQuantitativeComposition(molecule: Molecule) {
+export function getQuantitativeComposition(molecule: MoleculeModel) {
   const counts = new Map<string, number>();
   for (const atom of molecule.atoms) {
     counts.set(atom.element, (counts.get(atom.element) ?? 0) + 1);
@@ -107,7 +111,7 @@ export const MOLECULES: Record<string, Molecule> = {
     icon: '⚡',
     relevance:
       'Alternativa energética limpa, produzido por eletrólise da água usando energia renovável.',
-    hotspot: { x: 8, y: 9, flipBubble: true },
+    hotspot: { x: 10, y: 10, flipBubble: true },
   },
   H2O: {
     id: 'H2O',
@@ -131,7 +135,7 @@ export const MOLECULES: Record<string, Molecule> = {
     hotspotLabel: 'O lago',
     icon: '💧',
     relevance: 'Substância essencial à vida. Constitui 71% da superfície da Terra.',
-    hotspot: { x: 35, y: 52 },
+    hotspot: { x: 33, y: 55 },
   },
   O2: {
     id: 'O2',
@@ -153,7 +157,7 @@ export const MOLECULES: Record<string, Molecule> = {
     icon: '🌳',
     relevance:
       'Produzido pela fotossíntese da floresta e vegetação. É indispensável para a respiração celular da grande maioria dos organismos vivos.',
-    hotspot: { x: 86, y: 58 },
+    hotspot: { x: 82, y: 53 },
   },
   CO: {
     id: 'CO',
@@ -199,7 +203,7 @@ export const MOLECULES: Record<string, Molecule> = {
     icon: '🏭',
     relevance:
       'Gás resultante de processos industriais e da combustão de combustíveis fósseis. Essencial para a fotossíntese e responsável pelo efeito de estufa.',
-    hotspot: { x: 41, y: 16, flipBubble: true },
+    hotspot: { x: 37, y: 12, flipBubble: true },
   },
   O3: {
     id: 'O3',
@@ -224,7 +228,7 @@ export const MOLECULES: Record<string, Molecule> = {
     icon: '🛡️',
     relevance:
       'Forma-se na atmosfera a partir de três átomos de oxigénio e filtra a maior parte da radiação ultravioleta nociva do Sol, protegendo a vida na Terra.',
-    hotspot: { x: 92, y: 7, flipBubble: true },
+    hotspot: { x: 90, y: 8, flipBubble: true },
   },
   NH3: {
     id: 'NH3',
@@ -245,13 +249,13 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Piramidal trigonal',
       angle: '106.7°',
       description:
-        'O par de eletrões isolado do azoto empurra as três ligações N–H para baixo, formando uma pirâmide em vez do arranjo plano trigonal.',
+        'O par de eletrões isolado de nitrogénio empurra as três ligações N–H para baixo, formando uma pirâmide em vez do arranjo plano trigonal.',
     },
     hotspotLabel: 'O campo agrícola',
     icon: '🌾',
     relevance:
       'Composto muito utilizado na produção de fertilizantes agrícolas para nutrir o solo, e em produtos de limpeza.',
-    hotspot: { x: 15, y: 79 },
+    hotspot: { x: 17, y: 75 },
   },
   N2: {
     id: 'N2',
@@ -267,14 +271,119 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Linear',
       angle: '180°',
       description:
-        'Os dois átomos de azoto partilham três pares de eletrões numa ligação tripla muito forte; com apenas dois átomos, a forma é sempre linear.',
+        'Os dois átomos de nitrogénio partilham três pares de eletrões numa ligação tripla muito forte; com apenas dois átomos, a forma é sempre linear.',
     },
     hotspotLabel: 'O ar atmosférico',
     icon: '🌬️',
     relevance:
       'Componente maioritário do ar atmosférico (cerca de 78%), quimicamente inerte em condições normais.',
-    hotspot: { x: 55, y: 9, flipBubble: true },
+    hotspot: { x: 60, y: 10, flipBubble: true },
   },
 };
 
 export const MOLECULE_ORDER = ['H2O', 'O2', 'N2', 'CO2', 'CO', 'O3', 'H2', 'NH3'];
+
+export interface FactoryProduct {
+  id: string;
+  name: string;
+  /** 3D model shown rotating over the product's numbered button. */
+  model: MoleculeModel;
+  /** Caption under the rotating 3D model. */
+  modelLabel: string;
+  formula?: string;
+  molecule?: string;
+  /** Components of a mixture; products without it show the qualitative composition of their molecule. */
+  mixtureComposition?: string;
+  description: string;
+  hotspot: { x: number; y: number };
+}
+
+const ETHANOL_MODEL: MoleculeModel = {
+  atoms: [
+    { element: 'C', position: [-1.52, 0, 0] },
+    { element: 'C', position: [0, 0, 0] },
+    { element: 'O', position: [0.478, 1.348, 0] },
+    { element: 'H', position: [-1.884, 0.514, 0.89] },
+    { element: 'H', position: [-1.884, -1.028, 0] },
+    { element: 'H', position: [-1.884, 0.514, -0.89] },
+    { element: 'H', position: [0.364, -0.513, 0.891] },
+    { element: 'H', position: [0.364, -0.513, -0.891] },
+    { element: 'H', position: [1.438, 1.348, 0] },
+  ],
+  bonds: [
+    { from: 0, to: 1, order: 1 },
+    { from: 1, to: 2, order: 1 },
+    { from: 0, to: 3, order: 1 },
+    { from: 0, to: 4, order: 1 },
+    { from: 0, to: 5, order: 1 },
+    { from: 1, to: 6, order: 1 },
+    { from: 1, to: 7, order: 1 },
+    { from: 2, to: 8, order: 1 },
+  ],
+};
+
+const ACETONE_MODEL: MoleculeModel = {
+  atoms: [
+    { element: 'C', position: [0, 0, 0] },
+    { element: 'O', position: [0, 1.21, 0] },
+    { element: 'C', position: [1.289, -0.806, 0] },
+    { element: 'C', position: [-1.289, -0.806, 0] },
+    { element: 'H', position: [2.143, -0.127, 0] },
+    { element: 'H', position: [1.326, -1.435, 0.89] },
+    { element: 'H', position: [1.326, -1.435, -0.89] },
+    { element: 'H', position: [-2.143, -0.127, 0] },
+    { element: 'H', position: [-1.326, -1.435, 0.89] },
+    { element: 'H', position: [-1.326, -1.435, -0.89] },
+  ],
+  bonds: [
+    { from: 0, to: 1, order: 2 },
+    { from: 0, to: 2, order: 1 },
+    { from: 0, to: 3, order: 1 },
+    { from: 2, to: 4, order: 1 },
+    { from: 2, to: 5, order: 1 },
+    { from: 2, to: 6, order: 1 },
+    { from: 3, to: 7, order: 1 },
+    { from: 3, to: 8, order: 1 },
+    { from: 3, to: 9, order: 1 },
+  ],
+};
+
+export const FACTORY_PRODUCTS: FactoryProduct[] = [
+  {
+    id: 'ethyl-alcohol',
+    model: ETHANOL_MODEL,
+    modelLabel: 'C₂H₆O · Álcool etílico',
+    name: 'Álcool etílico comercial',
+    formula: 'C₂H₆O',
+    description: 'O álcool etílico comercial é uma mistura de duas substâncias moleculares: álcool etílico e água.',
+    hotspot: { x: 39, y: 56 },
+  },
+  {
+    id: 'distilled-water',
+    model: MOLECULES.H2O,
+    modelLabel: 'H₂O · Água',
+    name: 'Água destilada',
+    formula: 'H₂O',
+    description: 'A água destilada é frequentemente utilizada no laboratório, por exemplo na preparação de soluções.',
+    hotspot: { x: 51, y: 57 },
+  },
+  {
+    id: 'pure-acetone',
+    model: ACETONE_MODEL,
+    modelLabel: 'C₃H₆O · Acetona',
+    name: 'Acetona pura',
+    formula: 'C₃H₆O',
+    molecule: 'Acetona',
+    description: 'A acetona pura é constituída apenas por um único tipo de moléculas. É frequentemente utilizada no laboratório como solvente e reagente químico.',
+    hotspot: { x: 63, y: 60 },
+  },
+  {
+    id: 'commercial-acetone',
+    model: ACETONE_MODEL,
+    modelLabel: 'Acetona (componente principal)',
+    name: 'Acetona comercial',
+    mixtureComposition: 'Acetona (C₃H₆O), água (H₂O), óleo de rícino, fragrâncias e corantes.',
+    description: 'A acetona comercial não é uma substância pura, mas sim uma solução em que a acetona está misturada com outros componentes para evitar o ressecamento excessivo da pele e dar aroma. É comummente utilizada no dia a dia para remover verniz das unhas.',
+    hotspot: { x: 75, y: 47 },
+  },
+];

@@ -7,8 +7,13 @@ their molecular geometry.
 ## Features
 
 - A real-life scenario photo (lake, factory, wheat field, road, forest, sky)
-  with clickable/hoverable hotspots — hovering or clicking a point rotates
+  with clickable hotspots — clicking a point rotates
   the molecule found there right on the spot, e.g. the lake shows **H₂O**.
+- An **Explore the factory** button on the landscape opens a laboratory image
+  with four clickable bottles: pure acetone, commercial acetone, commercial
+  ethyl alcohol and distilled water. Selecting a bottle shows its composition,
+  classification (when applicable) and use, distinguishing pure substances
+  from commercial mixtures, while the molecule rotates in 3D above its button.
 - A quick-access list of all 8 molecules — clicking an entry highlights its
   hotspot on the scenario image and updates the info panel, no modal needed.
 - A 3D, ball-and-stick molecule viewer (Three.js) rendered live in a small
@@ -26,7 +31,8 @@ Molecules covered: H₂, H₂O, O₂, N₂, CO, CO₂, O₃, NH₃.
 ```text
 /
 ├── public
-│   └── scenario.jpeg          # Background scenario photo for the hotspots
+│   ├── scenario.jpeg          # Background scenario photo for the hotspots
+│   └── factory.jpeg           # Laboratory scene with four product hotspots
 ├── src
 │   ├── data
 │   │   ├── elements.ts        # Element colors, radii, atomic weights
@@ -35,6 +41,7 @@ Molecules covered: H₂, H₂O, O₂, N₂, CO, CO₂, O₃, NH₃.
 │   │   └── moleculeViewer.ts  # Three.js ball-and-stick viewer
 │   ├── components
 │   │   ├── MoleculeScene.astro # Scenario image + hotspots + rotating preview
+│   │   ├── FactoryScene.astro  # Laboratory modal + product details
 │   │   ├── MoleculeList.astro  # Quick-access molecule list
 │   │   └── MoleculeInfo.astro  # Relevance/composition/geometry info panel
 │   ├── layouts/Layout.astro

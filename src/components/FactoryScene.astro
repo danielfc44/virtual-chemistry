@@ -1,0 +1,571 @@
+---
+import { FACTORY_PRODUCTS, getQualitativeComposition, getQuantitativeComposition } from '../data/molecules';
+import { ELEMENTS } from '../data/elements';
+
+function joinNames(names: string[]) {
+  return names.length > 1 ? `${names.slice(0, -1).join(', ')} e ${names[names.length - 1]}` : names[0];
+}
+
+// Carbon first, then hydrogen, then the remaining elements alphabetically (Hill order).
+function hillRank(symbol: string) {
+  return symbol === 'C' ? 0 : symbol === 'H' ? 1 : 2;
+}
+
+function sortHill(symbols: string[]) {
+  return [...symbols].sort((first, second) => hillRank(first) - hillRank(second) || first.localeCompare(second));
+}
+
+const products = FACTORY_PRODUCTS.map((product) => {
+  if (product.mixtureComposition) return { product, composition: null };
+
+  const symbols = sortHill(getQualitativeComposition(product.model));
+  const counts = new Map(getQuantitativeComposition(product.model).breakdown.map((row) => [row.symbol, row.count]));
+  return {
+    product,
+    composition: {
+      symbols,
+      qualitative: `Esta molécula é composta por ${symbols.length} ${symbols.length > 1 ? 'elementos' : 'elemento'}: ${joinNames(symbols.map((symbol) => `${ELEMENTS[symbol].name} (${symbol})`))}.`,
+      quantitative: `Molécula constituída por ${joinNames(symbols.map((symbol) => `${counts.get(symbol)} ${counts.get(symbol) === 1 ? 'átomo' : 'átomos'} de ${ELEMENTS[symbol].name.toLowerCase()}`))}.`,
+    },
+  };
+});
+---
+
+<div class="factory-entry">
+  <button class="factory-open" type="button" aria-haspopup="dialog" aria-controls="factory-dialog">
+    🏭 Explorar a fábrica
+  </button>
+
+  <dialog id="factory-dialog" aria-labelledby="factory-title" aria-describedby="factory-hint">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <div>
+          <h2 id="factory-title">Dentro do laboratório da fábrica</h2>
+          <p id="factory-hint">Clique num dos quatro frascos para descobrir a sua composição.</p>
+        </div>
+        <button class="factory-close" type="button" aria-label="Fechar cenário da fábrica">✕</button>
+      </div>
+
+      <div class="factory-image-wrap">
+        <img
+          src={`${import.meta.env.BASE_URL}factory.jpeg`}
+          alt="Quatro frascos no laboratório: álcool etílico, água destilada, acetona pura e acetona comercial, da esquerda para a direita"
+          class="factory-image"
+        />
+        {FACTORY_PRODUCTS.map((product, index) => (
+          <button
+            type="button"
+            class="factory-hotspot"
+            data-product-id={product.id}
+            style={`left:${product.hotspot.x}%; top:${product.hotspot.y}%;`}
+            aria-label={`Mostrar ${product.name}`}
+            aria-pressed="false"
+          >
+            {index + 1}
+          </button>
+        ))}
+
+        <div class="factory-bubble" id="factory-bubble">
+          <canvas id="factory-canvas"></canvas>
+          <p class="factory-bubble-label" id="factory-bubble-label"></p>
+        </div>
+      </div>
+
+      <div class="factory-directory" role="group" aria-label="Todos os frascos">
+        {FACTORY_PRODUCTS.map((product) => (
+          <button
+            type="button"
+            class="factory-card"
+            data-product-id={product.id}
+            aria-pressed="false"
+          >
+            <span class="card-formula">{product.formula ?? 'Mistura'}</span>
+            <span class="card-name">{product.name}</span>
+          </button>
+        ))}
+      </div>
+
+      <div class="factory-details" aria-live="polite">
+        <p class="factory-placeholder">Selecione um frasco na imagem ou na lista para ver os seus detalhes.</p>
+        {products.map(({ product, composition }, index) => (
+          <article class="factory-product" data-product-details={product.id} hidden>
+            <p class="scene-tag">Frasco {index + 1}</p>
+            <h3>
+              {product.name}
+              {product.molecule && <span class="common-name">(Molécula: {product.molecule})</span>}
+            </h3>
+            {product.formula && <p class="formula">Fórmula química: {product.formula}</p>}
+
+            <div class="info-grid">
+              {composition ? (
+                <>
+                  <section>
+                    <h4>Composição qualitativa</h4>
+                    <p>{composition.qualitative}</p>
+                    <ul class="legend">
+                      {composition.symbols.map((symbol) => (
+                        <li>
+                          <span class="legend-dot" style={`background:${ELEMENTS[symbol].color}`} />
+                          {ELEMENTS[symbol].name}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                  <section>
+                    <h4>Composição quantitativa</h4>
+                    <p>{composition.quantitative}</p>
+                  </section>
+                </>
+              ) : (
+                <section class="full-row">
+                  <h4>Composição principal</h4>
+                  <p>{product.mixtureComposition}</p>
+                </section>
+              )}
+              <section class="full-row">
+                <h4>Descrição</h4>
+                <p>{product.description}</p>
+              </section>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </dialog>
+</div>
+
+<style>
+  .factory-entry {
+    position: absolute;
+    left: 46%;
+    top: 48%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+  }
+
+  .factory-open {
+    border: 1.5px solid #fff;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    background: #1d4ed8;
+    color: #fff;
+    box-shadow: 0 5px 16px rgba(15, 23, 42, 0.4);
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .factory-open:hover,
+  .factory-open:focus-visible {
+    background: #1e40af;
+    outline: 3px solid #facc15;
+    outline-offset: 2px;
+  }
+
+  dialog {
+    width: min(960px, calc(100% - 24px));
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 20px;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.4);
+    color: #0f172a;
+  }
+
+  dialog::backdrop {
+    background: rgba(15, 23, 42, 0.75);
+  }
+
+  .dialog-content {
+    padding: 20px;
+  }
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .dialog-header h2 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+  }
+
+  .dialog-header p {
+    margin: 0 0 16px;
+    color: #475569;
+  }
+
+  .factory-close {
+    border: 0;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    background: #e2e8f0;
+    color: #0f172a;
+    cursor: pointer;
+  }
+
+  .factory-close:focus-visible,
+  .factory-hotspot:focus-visible {
+    outline: 3px solid #2563eb;
+    outline-offset: 3px;
+  }
+
+  .factory-image-wrap {
+    position: relative;
+    aspect-ratio: 1024 / 559;
+  }
+
+  .factory-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+  }
+
+  .factory-hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 34px;
+    height: 34px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #facc15;
+    color: #0f172a;
+    font-weight: 700;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.5);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .factory-hotspot:hover {
+    transform: translate(-50%, -50%) scale(1.25);
+    box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.55), 0 2px 10px rgba(15, 23, 42, 0.5);
+  }
+
+  .factory-hotspot[aria-pressed='true'] {
+    background: #2563eb;
+    color: #fff;
+  }
+
+  .factory-hotspot {
+    z-index: 2;
+  }
+
+  .factory-bubble {
+    --shift-x: 0px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 150px;
+    transform: translate(calc(-50% + var(--shift-x)), calc(-100% - 22px)) scale(0.85);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 3;
+  }
+
+  .factory-bubble.flip-down {
+    transform: translate(calc(-50% + var(--shift-x)), 22px) scale(0.85);
+  }
+
+  .factory-bubble.is-active {
+    opacity: 1;
+    transform: translate(calc(-50% + var(--shift-x)), calc(-100% - 22px)) scale(1);
+  }
+
+  .factory-bubble.is-active.flip-down {
+    transform: translate(calc(-50% + var(--shift-x)), 22px) scale(1);
+  }
+
+  #factory-canvas {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 30%, #eef2ff 0%, #dbe4ff 100%);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.35), 0 0 0 4px rgba(255, 255, 255, 0.9);
+  }
+
+  .factory-bubble-label {
+    margin: 6px 0 0;
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 999px;
+    padding: 2px 10px;
+  }
+
+  .factory-directory {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .factory-card {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+
+  .factory-card:hover,
+  .factory-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.1);
+    border-color: #93c5fd;
+    outline: none;
+  }
+
+  .factory-card[aria-pressed='true'] {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  }
+
+  .card-formula {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    white-space: nowrap;
+  }
+
+  .card-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #0f172a;
+    white-space: nowrap;
+  }
+
+  .factory-details {
+    margin-top: 16px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  }
+
+  .factory-placeholder {
+    margin: 0;
+    text-align: center;
+    color: #64748b;
+  }
+
+  .factory-placeholder[hidden],
+  .factory-product[hidden] {
+    display: none;
+  }
+
+  .scene-tag {
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #2563eb;
+  }
+
+  .factory-product h3 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #0f172a;
+  }
+
+  .common-name {
+    margin-left: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #64748b;
+  }
+
+  .formula {
+    margin: 2px 0 20px;
+    font-size: 1.1rem;
+    color: #475569;
+  }
+
+  .factory-product h3 + .info-grid {
+    margin-top: 20px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    font-size: 0.78rem;
+    color: #1e293b;
+  }
+
+  .legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid rgba(15, 23, 42, 0.25);
+    display: inline-block;
+  }
+
+  .full-row {
+    grid-column: 1 / -1;
+  }
+
+  .info-grid h4 {
+    margin: 0 0 6px;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+  }
+
+  .info-grid p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #1e293b;
+  }
+
+  @media (max-width: 640px) {
+    .factory-entry {
+      left: 47%;
+      top: 43%;
+    }
+
+    .factory-open {
+      padding: 3px 6px;
+      font-size: 0.6rem;
+    }
+
+    .dialog-content {
+      padding: 12px;
+    }
+
+    .factory-hotspot {
+      width: 30px;
+      height: 30px;
+    }
+
+    .factory-details {
+      padding: 18px;
+    }
+
+    .factory-bubble {
+      width: 110px;
+    }
+
+    #factory-canvas {
+      width: 110px;
+      height: 110px;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { FACTORY_PRODUCTS } from '../data/molecules';
+  import type { MoleculeViewerHandle } from '../lib/moleculeViewer';
+
+  const openButton = document.querySelector<HTMLButtonElement>('.factory-open')!;
+  const dialog = document.querySelector<HTMLDialogElement>('#factory-dialog')!;
+  const closeButton = dialog.querySelector<HTMLButtonElement>('.factory-close')!;
+  const imageWrap = dialog.querySelector<HTMLElement>('.factory-image-wrap')!;
+  const hotspots = Array.from(dialog.querySelectorAll<HTMLButtonElement>('.factory-hotspot'));
+  const cards = Array.from(dialog.querySelectorAll<HTMLButtonElement>('.factory-card'));
+  const details = Array.from(dialog.querySelectorAll<HTMLElement>('.factory-product'));
+  const bubble = dialog.querySelector<HTMLElement>('#factory-bubble')!;
+  const canvas = dialog.querySelector<HTMLCanvasElement>('#factory-canvas')!;
+  const placeholder = dialog.querySelector<HTMLElement>('.factory-placeholder')!;
+  const bubbleLabel = dialog.querySelector<HTMLElement>('#factory-bubble-label')!;
+
+  let viewerHandle: MoleculeViewerHandle | null = null;
+
+  async function showBubble(productId: string) {
+    const product = FACTORY_PRODUCTS.find((candidate) => candidate.id === productId);
+    if (!product) return;
+
+    bubble.style.removeProperty('--shift-x');
+    bubble.classList.remove('flip-down');
+    bubble.style.left = `${product.hotspot.x}%`;
+    bubble.style.top = `${product.hotspot.y}%`;
+    bubbleLabel.textContent = product.modelLabel;
+    bubble.classList.add('is-active');
+
+    if (!viewerHandle) {
+      const { createMoleculeViewer } = await import('../lib/moleculeViewer');
+      if (!dialog.open) return;
+      viewerHandle = createMoleculeViewer(canvas);
+    }
+    viewerHandle.setMolecule(product.model);
+
+    // Keep the preview inside the image: flip it below the button or nudge it sideways.
+    requestAnimationFrame(() => {
+      const wrapRect = imageWrap.getBoundingClientRect();
+      if (bubble.getBoundingClientRect().top < wrapRect.top) bubble.classList.add('flip-down');
+
+      const bubbleRect = bubble.getBoundingClientRect();
+      if (bubbleRect.left < wrapRect.left) {
+        bubble.style.setProperty('--shift-x', `${wrapRect.left - bubbleRect.left + 8}px`);
+      } else if (bubbleRect.right > wrapRect.right) {
+        bubble.style.setProperty('--shift-x', `${wrapRect.right - bubbleRect.right - 8}px`);
+      }
+    });
+  }
+
+  function selectProduct(productId: string | null) {
+    placeholder.hidden = productId !== null;
+    [...hotspots, ...cards].forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.productId === productId));
+    });
+    details.forEach((panel) => {
+      panel.hidden = panel.dataset.productDetails !== productId;
+    });
+    if (productId) showBubble(productId);
+    else bubble.classList.remove('is-active');
+  }
+
+  openButton.addEventListener('click', () => dialog.showModal());
+  closeButton.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  dialog.addEventListener('close', () => {
+    viewerHandle?.dispose();
+    viewerHandle = null;
+    selectProduct(null);
+  });
+
+  [...hotspots, ...cards].forEach((button) => {
+    button.addEventListener('click', () => selectProduct(button.dataset.productId!));
+  });
+</script>

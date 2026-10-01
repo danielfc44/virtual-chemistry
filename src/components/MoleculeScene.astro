@@ -1,5 +1,6 @@
 ---
 import { MOLECULES, MOLECULE_ORDER } from '../data/molecules';
+import FactoryScene from './FactoryScene.astro';
 ---
 
 <div class="scene-wrap" id="molecule-scene">
@@ -24,13 +25,15 @@ import { MOLECULES, MOLECULE_ORDER } from '../data/molecules';
     );
   })}
 
+  <FactoryScene />
+
   <div class="bubble" id="molecule-bubble">
     <canvas id="molecule-canvas"></canvas>
     <p class="bubble-label" id="bubble-label"></p>
   </div>
 </div>
 
-<p class="scene-hint">🖱️ Passe o rato ou clique num ponto da imagem para ver a molécula a rodar no local.</p>
+<p class="scene-hint">🖱️ Clique num ponto da imagem para ver a molécula a rodar no local.</p>
 
 <style>
   .scene-wrap {
@@ -77,6 +80,17 @@ import { MOLECULES, MOLECULE_ORDER } from '../data/molecules';
     justify-content: center;
     font-size: 13px;
     line-height: 1;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+
+  .hotspot:hover .hotspot-dot,
+  .hotspot:focus-visible .hotspot-dot {
+    transform: scale(1.35);
+    border-color: #2563eb;
+  }
+
+  .hotspot:focus-visible {
+    outline: none;
   }
 
   .hotspot.is-active .hotspot-dot {
@@ -229,7 +243,6 @@ import { MOLECULES, MOLECULE_ORDER } from '../data/molecules';
   hotspots.forEach((hotspot) => {
     const id = hotspot.dataset.moleculeId!;
     hotspot.addEventListener('click', () => selectAndBroadcast(id));
-    hotspot.addEventListener('pointerenter', () => selectAndBroadcast(id));
   });
 
   window.addEventListener('molecule:select', ((event: CustomEvent<{ id: string }>) => {
