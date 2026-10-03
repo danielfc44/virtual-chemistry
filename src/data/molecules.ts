@@ -105,7 +105,7 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Linear',
       angle: '180°',
       description:
-        'Uma molécula diatómica: dois átomos unidos por uma ligação covalente simples formam sempre uma linha reta.',
+        'Uma molécula diatómica: dois átomos unidos por uma ligação covalente simples.',
     },
     hotspotLabel: 'Energia limpa',
     icon: '⚡',
@@ -130,7 +130,8 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Angular',
       angle: '104.5°',
       description:
-        'O oxigénio tem dois pares de eletrões isolados que empurram as ligações O–H uma contra a outra, dobrando a molécula em vez de a deixar linear.',
+        'O átomo de oxigénio apresenta dois pares de eletrões não ligantes, os quais exercem uma intensa repulsão eletrostática sobre os pares de eletrões ligantes das ligações O–H. ' +
+        'Para minimizar estas repulsaões e atingir a máxima estabilidade, a molécula adota uma geometria angular (e não linear).',
     },
     hotspotLabel: 'O lago',
     icon: '💧',
@@ -151,7 +152,7 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Linear',
       angle: '180°',
       description:
-        'Dois átomos de oxigénio partilham dois pares de eletrões numa ligação dupla, e qualquer molécula de dois átomos é necessariamente linear.',
+        'Dois átomos de oxigénio partilham dois pares de eletrões numa ligação covalente dupla, e qualquer molécula diatómica é necessariamente linear.',
     },
     hotspotLabel: 'A floresta',
     icon: '🌳',
@@ -172,12 +173,12 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Linear',
       angle: '180°',
       description:
-        'O carbono e o oxigénio partilham três pares de eletrões numa ligação tripla; com apenas dois átomos, a forma é sempre linear.',
+        'O carbono e o oxigénio partilham três pares de eletrões numa ligação covalente tripla; com apenas dois átomos, a geometria é sempre linear.',
     },
     hotspotLabel: 'O carro na estrada',
     icon: '🚗',
     relevance:
-      'Gás poluente tóxico resultante da combustão incompleta de combustível no motor do veículo.',
+      'Gás poluente tóxico resultante da combustão incompleta de combustíveis em veículos e em aquecedores antigos ou mal ventilados.',
     hotspot: { x: 73, y: 83 },
   },
   CO2: {
@@ -197,7 +198,7 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Linear',
       angle: '180°',
       description:
-        'O carbono não tem pares de eletrões isolados aqui, por isso as duas ligações duplas ao oxigénio apontam em direções exatamente opostas.',
+        'O carbono central não tem pares de eletrões não ligantes, apenas dois grupos de eletrões ligantes nas ligações C=O. Para minimizar a repulsão entre eles, a molécula adota uma geometria linear (180º).',
     },
     hotspotLabel: 'Fumo da fábrica',
     icon: '🏭',
@@ -222,7 +223,7 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Angular',
       angle: '116.8°',
       description:
-        'O oxigénio central tem um par de eletrões isolado que dobra a molécula, e a ressonância distribui os eletrões de ligação uniformemente pelas duas ligações O–O.',
+        'o átomo central de oxigénio possui um par de eletrões não ligantes que repulsa os pares ligantes vizinhos, conferindo à molécula uma geometria angular (e não linear). A ressonância distribui os eletrões da ligação uniformemente pelas duas ligações O–O.',
     },
     hotspotLabel: 'Camada de ozono',
     icon: '🛡️',
@@ -249,7 +250,7 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Piramidal trigonal',
       angle: '106.7°',
       description:
-        'O par de eletrões isolado de nitrogénio empurra as três ligações N–H para baixo, formando uma pirâmide em vez do arranjo plano trigonal.',
+        'O par de eletrões não ligantes de nitrogénio exerce uma intensa repulsão sobre os pares ligantes N–H, fletindo as ligações para baixo. Para minimizar essa repulsão, a molécula de amoníaco (NH3) adota uma geometria piramidal trigonal em vez de uma estrutura plana trigonal.',
     },
     hotspotLabel: 'O campo agrícola',
     icon: '🌾',
@@ -271,7 +272,7 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Linear',
       angle: '180°',
       description:
-        'Os dois átomos de nitrogénio partilham três pares de eletrões numa ligação tripla muito forte; com apenas dois átomos, a forma é sempre linear.',
+        'Os dois átomos de nitrogénio partilham três pares de eletrões numa ligação covalente tripla muito forte.',
     },
     hotspotLabel: 'O ar atmosférico',
     icon: '🌬️',
@@ -355,7 +356,7 @@ export const FACTORY_PRODUCTS: FactoryProduct[] = [
     modelLabel: 'C₂H₆O · Álcool etílico',
     name: 'Álcool etílico comercial',
     formula: 'C₂H₆O',
-    description: 'O álcool etílico comercial é uma mistura de duas substâncias moleculares: álcool etílico e água.',
+    description: 'É usado como desinfetante e antisséptico para eliminar microrganismos, solvente para limpeza e fabricação de produtos, e em combustíveis. O álcool etílico comercial é uma mistura de duas substâncias moleculares: álcool etílico e água.',
     hotspot: { x: 39, y: 56 },
   },
   {
