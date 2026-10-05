@@ -223,7 +223,7 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Angular',
       angle: '116.8°',
       description:
-        'o átomo central de oxigénio possui um par de eletrões não ligantes que repulsa os pares ligantes vizinhos, conferindo à molécula uma geometria angular (e não linear). A ressonância distribui os eletrões da ligação uniformemente pelas duas ligações O–O.',
+        'O átomo central de oxigénio possui um par de eletrões não ligantes que repulsa os pares ligantes vizinhos, conferindo à molécula uma geometria angular (e não linear). A ressonância distribui os eletrões da ligação uniformemente pelas duas ligações O–O.',
     },
     hotspotLabel: 'Camada de ozono',
     icon: '🛡️',
@@ -250,7 +250,7 @@ export const MOLECULES: Record<string, Molecule> = {
       shape: 'Piramidal trigonal',
       angle: '106.7°',
       description:
-        'O par de eletrões não ligantes de nitrogénio exerce uma intensa repulsão sobre os pares ligantes N–H, fletindo as ligações para baixo. Para minimizar essa repulsão, a molécula de amoníaco (NH3) adota uma geometria piramidal trigonal em vez de uma estrutura plana trigonal.',
+        'O par de eletrões não ligantes de nitrogénio exerce uma intensa repulsão sobre os pares ligantes N–H, fletindo as ligações para baixo. Para minimizar essa repulsão, a molécula de amoníaco (NH₃) adota uma geometria piramidal trigonal em vez de uma estrutura plana trigonal.',
     },
     hotspotLabel: 'O campo agrícola',
     icon: '🌾',
