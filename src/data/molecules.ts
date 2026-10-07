@@ -135,7 +135,7 @@ export const MOLECULES: Record<string, Molecule> = {
     },
     hotspotLabel: 'O lago',
     icon: '💧',
-    relevance: 'Substância essencial à vida. Constitui 71% da superfície da Terra.',
+    relevance: 'Substância essencial à vida. Os oceanos cobrem aproximadamente 71% da superfície da Terra.',
     hotspot: { x: 33, y: 55 },
   },
   O2: {
@@ -203,7 +203,7 @@ export const MOLECULES: Record<string, Molecule> = {
     hotspotLabel: 'Fumo da fábrica',
     icon: '🏭',
     relevance:
-      'Gás resultante de processos industriais e da combustão de combustíveis fósseis. Essencial para a fotossíntese e responsável pelo efeito de estufa.',
+      'Gás resultante de processos industriais e da combustão de combustíveis fósseis. Essencial para a fotossíntese e responsável pelo aumento do efeito de estufa.',
     hotspot: { x: 37, y: 12, flipBubble: true },
   },
   O3: {
@@ -228,7 +228,7 @@ export const MOLECULES: Record<string, Molecule> = {
     hotspotLabel: 'Camada de ozono',
     icon: '🛡️',
     relevance:
-      'Forma-se na atmosfera a partir de três átomos de oxigénio e filtra a maior parte da radiação ultravioleta nociva do Sol, protegendo a vida na Terra.',
+      'Ao nível da estratosfera, filtra a maior parte da radiação ultravioleta nociva do Sol, protegendo a vida na Terra.',
     hotspot: { x: 90, y: 8, flipBubble: true },
   },
   NH3: {
@@ -356,7 +356,7 @@ export const FACTORY_PRODUCTS: FactoryProduct[] = [
     modelLabel: 'C₂H₆O · Álcool etílico',
     name: 'Álcool etílico comercial',
     formula: 'C₂H₆O',
-    description: 'É usado como desinfetante e antisséptico para eliminar microrganismos, solvente para limpeza e fabricação de produtos, e em combustíveis. O álcool etílico comercial é uma mistura de duas substâncias moleculares: álcool etílico e água.',
+    description: 'Usado como desinfetante e para a fabricação de vários produtos essenciais do quotidiano. O álcool etílico comercial é uma mistura de duas substâncias moleculares: álcool etílico e água.',
     hotspot: { x: 39, y: 56 },
   },
   {
@@ -375,7 +375,7 @@ export const FACTORY_PRODUCTS: FactoryProduct[] = [
     name: 'Acetona pura',
     formula: 'C₃H₆O',
     molecule: 'Acetona',
-    description: 'A acetona pura é constituída apenas por um único tipo de moléculas. É frequentemente utilizada no laboratório como solvente e reagente químico.',
+    description: 'É frequentemente utilizada no laboratório como solvente e reagente químico.',
     hotspot: { x: 63, y: 60 },
   },
   {

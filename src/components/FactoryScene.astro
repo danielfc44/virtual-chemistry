@@ -19,13 +19,17 @@ const products = FACTORY_PRODUCTS.map((product) => {
   if (product.mixtureComposition) return { product, composition: null };
 
   const symbols = sortHill(getQualitativeComposition(product.model));
-  const counts = new Map(getQuantitativeComposition(product.model).breakdown.map((row) => [row.symbol, row.count]));
+  const quantitative = getQuantitativeComposition(product.model);
+  const counts = new Map(quantitative.breakdown.map((row) => [row.symbol, row.count]));
+  const atomCounts = joinNames(
+    symbols.map((symbol) => `${counts.get(symbol)} ${counts.get(symbol) === 1 ? 'átomo' : 'átomos'} de ${ELEMENTS[symbol].name.toLowerCase()}`),
+  );
   return {
     product,
     composition: {
       symbols,
       qualitative: `Esta molécula é composta por ${symbols.length} ${symbols.length > 1 ? 'elementos' : 'elemento'}: ${joinNames(symbols.map((symbol) => `${ELEMENTS[symbol].name} (${symbol})`))}.`,
-      quantitative: `Molécula constituída por ${joinNames(symbols.map((symbol) => `${counts.get(symbol)} ${counts.get(symbol) === 1 ? 'átomo' : 'átomos'} de ${ELEMENTS[symbol].name.toLowerCase()}`))}.`,
+      quantitative: `Molécula constituída por ${atomCounts}, num total de ${quantitative.totalAtoms} ${quantitative.totalAtoms === 1 ? 'átomo' : 'átomos'}.`,
     },
   };
 });

@@ -10,11 +10,6 @@
 
   <div class="info-grid">
     <section>
-      <h3>Relevância</h3>
-      <p id="m-relevance"></p>
-    </section>
-
-    <section>
       <h3>Composição qualitativa</h3>
       <p id="m-qualitative"></p>
       <ul class="legend" id="m-legend"></ul>
@@ -22,25 +17,12 @@
 
     <section>
       <h3>Composição quantitativa</h3>
-      <table id="m-quantitative-table">
-        <thead>
-          <tr>
-            <th>Elemento</th>
-            <th>Átomos</th>
-            <th>Massa %</th>
-          </tr>
-        </thead>
-        <tbody id="m-quantitative-body"></tbody>
-      </table>
-      <p class="molar-mass" id="m-molar-mass"></p>
+      <p id="m-quantitative"></p>
     </section>
 
-    <section>
-      <h3>Geometria molecular</h3>
-      <p class="geometry-headline">
-        <strong id="m-geometry-shape"></strong> · ângulo de ligação <span id="m-geometry-angle"></span>
-      </p>
-      <p id="m-geometry-description"></p>
+    <section class="relevance">
+      <h3>Relevância</h3>
+      <p id="m-relevance"></p>
     </section>
   </div>
   </div>
@@ -94,6 +76,10 @@
     gap: 20px;
   }
 
+  .info-grid .relevance {
+    grid-column: 1 / -1;
+  }
+
   .info-panel section h3 {
     margin: 0 0 6px;
     font-size: 0.82rem;
@@ -133,30 +119,6 @@
     border-radius: 50%;
     border: 1px solid rgba(15, 23, 42, 0.25);
     display: inline-block;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-  }
-
-  th,
-  table :global(td) {
-    text-align: left;
-    padding: 6px 8px;
-    border-bottom: 1px solid #e2e8f0;
-  }
-
-  th {
-    color: #64748b;
-    font-weight: 600;
-  }
-
-  .molar-mass {
-    margin-top: 8px;
-    font-weight: 600;
-    color: #0f172a;
   }
 
   .geometry-headline {
@@ -214,20 +176,12 @@
       )
       .join('');
 
-    const tbody = document.getElementById('m-quantitative-body')!;
-    tbody.innerHTML = quantitative.breakdown
-      .map(
-        (row) => `
-          <tr>
-            <td>${row.name} (${row.symbol})</td>
-            <td>${row.count}</td>
-            <td>${row.massPercent.toFixed(1)}%</td>
-          </tr>`,
-      )
-      .join('');
+    const atomCounts = quantitative.breakdown.map(
+      ({ name, count }) => `${count} ${count === 1 ? 'átomo' : 'átomos'} de ${name.toLowerCase()}`,
+    );
     text(
-      'm-molar-mass',
-      `Total: ${quantitative.totalAtoms} átomos · Massa molar ≈ ${quantitative.molarMass.toFixed(2)} g/mol`,
+      'm-quantitative',
+      `Molécula constituída por ${atomCounts.join(' e ')}, num total de ${quantitative.totalAtoms} ${quantitative.totalAtoms === 1 ? 'átomo' : 'átomos'}.`,
     );
 
     text('m-geometry-shape', molecule.geometry.shape);
